@@ -1,0 +1,41 @@
+INITIALIZER:
+    from Tkinter import *
+    from DWatchGUI import DWatchGUI
+    
+    root = Tk()
+    root.title("Kys me now")
+    g = DWatchGUI(root, eventhandler)
+    
+    eventhandler.start()
+    
+    root.mainloop()
+
+STATECHART:
+    N [DS]
+    L
+      O [DS]
+      T
+
+TRANSITION:
+    S: N
+    N: N
+    T: 1
+    O: g.increaseTimeByOne()
+
+TRANSITION:
+    S: N
+    N: L
+    E: lightOn
+    O: g.setIndiglo()
+
+TRANSITION:
+    S: L.O
+    N: L.T
+    E: lightOff
+    O: print "light turning off"
+
+TRANSITION:
+    S: L.T
+    N: N
+    T: 2
+    O: g.unsetIndiglo()
