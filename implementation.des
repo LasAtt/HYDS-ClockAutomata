@@ -15,12 +15,25 @@ STATECHART:
     L
       O [DS]
       T
-    H
+    C
+    AH
+    A
+      D [DS]
+      LH
+      RH
+      I
+    EH
     E
       D [DS]
       LH
       RH
       I
+
+TRANSITION:
+    S: N
+    N: N
+    T: 1
+    O: g.increaseTimeByOne()
 
 TRANSITION:
     S: N
@@ -40,10 +53,103 @@ TRANSITION:
     T: 2
     O: g.unsetIndiglo()
 
+#Chrono mode
+
+TRANSITION:
+    S: N
+    N: C
+    E: changeMode
+    O: g.refreshChronoDisplay()
+
+TRANSITION:
+    S: C
+    N: C
+    T: 1
+    O: g.refreshChronoDisplay()
+
+TRANSITION:
+    S: C
+    N: N
+    E: changeMode
+    O: g.refreshTimeDisplay()
+
+#Alarm mode + edit
+
+TRANSITION:
+    S: N
+    N: AH
+    E: setAlarm
+    O: g.refreshAlarmDisplay()
+
+TRANSITION:
+    S: AH
+    N: A.D
+    T: 1.5
+    O: g.refreshAlarmDisplay()
+
+TRANSITION:
+    S: AH
+    N: N
+    E: topLeftReleased
+    O: print "release"
+
+
+TRANSITION:
+    S: A.D
+    N: A.LH
+    E: increase
+    O: print "increase pressed"
+
+TRANSITION:
+    S: A.LH
+    N: A.D
+    E: stopInc
+    O: g.increaseTimeByOne()
+
+TRANSITION:
+    S: A.LH
+    N: A.I
+    T: 0.3
+    O: g.increaseTimeByOne()
+
+TRANSITION:
+    S: A.I
+    N: A.I
+    T: 0.3
+    O: g.increaseTimeByOne()
+
+TRANSITION:
+    S: A.I
+    N: A.D
+    E: stopInc
+    O: print "enough"
+
+TRANSITION:
+    S: A.D
+    N: A.RH
+    E: finishEdit
+    O: print "aaAA"
+
+TRANSITION:
+    S: A.RH
+    N: N
+    T: 2
+    O: print "exit edit"
+
+TRANSITION:
+    S: A.RH
+    N: A.D
+    E: released
+    O: print "WHY did you do that"
+
+
+
+#Edit time
+
 TRANSITION:
     S: N
     N: H
-    E: initChrono
+    E: editTime
     O: print "button pressed"
 
 TRANSITION:
