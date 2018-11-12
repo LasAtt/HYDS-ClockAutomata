@@ -1,13 +1,13 @@
 INITIALIZER:
     from Tkinter import *
     from DWatchGUI import DWatchGUI
-    
+
     root = Tk()
     root.title("Kys me now")
     g = DWatchGUI(root, eventhandler)
-    
+
     eventhandler.start()
-    
+
     root.mainloop()
 
 STATECHART:
@@ -15,12 +15,12 @@ STATECHART:
     L
       O [DS]
       T
-
-TRANSITION:
-    S: N
-    N: N
-    T: 1
-    O: g.increaseTimeByOne()
+    H
+    E
+      D [DS]
+      LH
+      RH
+      I
 
 TRANSITION:
     S: N
@@ -39,3 +39,75 @@ TRANSITION:
     N: N
     T: 2
     O: g.unsetIndiglo()
+
+TRANSITION:
+    S: N
+    N: H
+    E: initChrono
+    O: print "button pressed"
+
+TRANSITION:
+    S: H
+    N: N
+    E: released
+    O: print "button released"
+
+TRANSITION:
+    S: H
+    N: E
+    T: 1.5
+    O: print "edit time"
+
+TRANSITION:
+    S: E.D
+    N: N
+    T: 5
+    O: print "exiting edit mode"
+
+TRANSITION:
+    S: E.D
+    N: E.LH
+    E: increase
+    O: print "increase pressed"
+
+TRANSITION:
+    S: E.LH
+    N: E.D
+    E: stopInc
+    O: g.increaseTimeByOne()
+
+TRANSITION:
+    S: E.LH
+    N: E.I
+    T: 0.3
+    O: g.increaseTimeByOne()
+
+TRANSITION:
+    S: E.I
+    N: E.I
+    T: 0.3
+    O: g.increaseTimeByOne()
+
+TRANSITION:
+    S: E.I
+    N: E.D
+    E: stopInc
+    O: print "enough"
+
+TRANSITION:
+    S: E.D
+    N: E.RH
+    E: finishEdit
+    O: print "aaAA"
+
+TRANSITION:
+    S: E.RH
+    N: N
+    T: 2
+    O: print "exit edit"
+
+TRANSITION:
+    S: E.RH
+    N: E.D
+    E: released
+    O: print "WHY did you do that"
