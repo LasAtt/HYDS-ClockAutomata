@@ -16,13 +16,10 @@ STATECHART:
       O [DS]
       T
     C
-    AH
-    A
       D [DS]
-      LH
-      RH
-      I
-    EH
+      A
+    AH
+    TH
     E
       D [DS]
       LH
@@ -53,27 +50,51 @@ TRANSITION:
     T: 2
     O: g.unsetIndiglo()
 
-#Chrono mode
+#Chrono mode (still need to increase chrono 100 times per second)
 
 TRANSITION:
     S: N
-    N: C
+    N: C.D
     E: changeMode
     O: g.refreshChronoDisplay()
 
 TRANSITION:
-    S: C
-    N: C
-    T: 1
-    O: g.refreshChronoDisplay()
-
-TRANSITION:
-    S: C
+    S: C.D
     N: N
     E: changeMode
     O: g.refreshTimeDisplay()
 
-#Alarm mode + edit
+TRANSITION:
+    S: C.A
+    N: N
+    E: changeMode
+    O: g.refreshTimeDisplay()
+
+TRANSITION:
+    S: C.D
+    N: C.A
+    E: initChrono
+    O: g.increaseChronoByOne()
+
+TRANSITION:
+    S: C.A
+    N: C.A
+    E: 0.25
+    O: g.refreshChronoDisplay()
+
+TRANSITION:
+    S: C.A
+    N: C.D
+    E: initChrono
+    O: g.refreshChronoDisplay()
+
+TRANSITION:
+    S: C
+    N: C
+    E: resetChrono
+    O: g.resetChrono()
+
+#Edit alarm
 
 TRANSITION:
     S: N
@@ -83,92 +104,44 @@ TRANSITION:
 
 TRANSITION:
     S: AH
-    N: A.D
+    N: E.D
     T: 1.5
-    O: g.refreshAlarmDisplay()
+    O: g.startSelection()
 
 TRANSITION:
     S: AH
     N: N
-    E: topLeftReleased
-    O: print "release"
-
-
-TRANSITION:
-    S: A.D
-    N: A.LH
-    E: increase
-    O: print "increase pressed"
-
-TRANSITION:
-    S: A.LH
-    N: A.D
-    E: stopInc
-    O: g.increaseTimeByOne()
-
-TRANSITION:
-    S: A.LH
-    N: A.I
-    T: 0.3
-    O: g.increaseTimeByOne()
-
-TRANSITION:
-    S: A.I
-    N: A.I
-    T: 0.3
-    O: g.increaseTimeByOne()
-
-TRANSITION:
-    S: A.I
-    N: A.D
-    E: stopInc
-    O: print "enough"
-
-TRANSITION:
-    S: A.D
-    N: A.RH
-    E: finishEdit
-    O: print "aaAA"
-
-TRANSITION:
-    S: A.RH
-    N: N
-    T: 2
-    O: print "exit edit"
-
-TRANSITION:
-    S: A.RH
-    N: A.D
-    E: released
-    O: print "WHY did you do that"
-
+    E: onoff
+    O: g.refreshTimeDisplay()
 
 
 #Edit time
 
 TRANSITION:
     S: N
-    N: H
+    N: TH
     E: editTime
     O: print "button pressed"
 
 TRANSITION:
-    S: H
+    S: TH
     N: N
     E: released
     O: print "button released"
 
 TRANSITION:
-    S: H
+    S: TH
     N: E
     T: 1.5
-    O: print "edit time"
+    O: g.startSelection()
+
+#Shared selection edit
 
 TRANSITION:
     S: E.D
     N: N
     T: 5
-    O: print "exiting edit mode"
+    O: g.stopSelection()
 
 TRANSITION:
     S: E.D
@@ -180,19 +153,19 @@ TRANSITION:
     S: E.LH
     N: E.D
     E: stopInc
-    O: g.increaseTimeByOne()
+    O: g.increaseSelection()
 
 TRANSITION:
     S: E.LH
     N: E.I
     T: 0.3
-    O: g.increaseTimeByOne()
+    O: g.increaseSelection()
 
 TRANSITION:
     S: E.I
     N: E.I
     T: 0.3
-    O: g.increaseTimeByOne()
+    O: g.increaseSelection()
 
 TRANSITION:
     S: E.I
@@ -210,10 +183,10 @@ TRANSITION:
     S: E.RH
     N: N
     T: 2
-    O: print "exit edit"
+    O: g.stopSelection()
 
 TRANSITION:
     S: E.RH
     N: E.D
     E: released
-    O: print "WHY did you do that"
+    O: g.selectNext()
