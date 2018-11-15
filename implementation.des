@@ -1,12 +1,15 @@
 INITIALIZER:
     from Tkinter import *
     from DWatchGUI import DWatchGUI
-    from ChronoUpdater import ChronoUpdater
+    from AsyncUpdater import AsyncUpdater
 
     root = Tk()
-    root.title("Kys me now")
+    root.title("Serious title")
     g = DWatchGUI(root, eventhandler)
-    u = ChronoUpdater(g)
+    t = AsyncUpdater(g.increaseTimeByOne, g.refreshTimeDisplay, 1)
+    t.start()
+    t.show()
+    c = AsyncUpdater(g.increaseChronoByOne, g.refreshChronoDisplay, 0.25)
 
     eventhandler.start()
     root.mainloop()
@@ -26,12 +29,6 @@ STATECHART:
       LH
       RH
       I
-
-TRANSITION:
-    S: N
-    N: N
-    T: 1
-    O: g.increaseTimeByOne()
 
 TRANSITION:
     S: N
@@ -57,35 +54,36 @@ TRANSITION:
     S: N
     N: C
     E: changeMode
-    O: u.show()
+    O: t.hide()
+       c.show()
        g.refreshChronoDisplay()
 
 TRANSITION:
     S: C
     N: N
     E: changeMode
-    O:  u.hide()
-        g.refreshTimeDisplay()
+    O: c.hide()
+       t.show()
+       g.refreshTimeDisplay()
 
 TRANSITION:
     S: C.P
     N: C.R
-    E: released
-    O: u.start()
+    E: initChrono
+    O: c.start()
 
 TRANSITION:
     S: C.R
     N: C.P
-    E: released
-    O: u.stop()
+    E: initChrono
+    O: c.stop()
 
 TRANSITION:
     S: C
     N: C
     E: resetChrono
-    O: u.stop()
-       g.resetChrono()
-       u.start()
+    O: g.resetChrono()
+       c.start()
 
 #Edit alarm
 
@@ -93,7 +91,8 @@ TRANSITION:
     S: N
     N: AH
     E: setAlarm
-    O: g.refreshAlarmDisplay()
+    O: t.hide()
+       g.refreshAlarmDisplay()
 
 TRANSITION:
     S: AH
@@ -105,8 +104,7 @@ TRANSITION:
     S: AH
     N: N
     E: onoff
-    O: g.refreshTimeDisplay()
-
+    O: t.show()
 
 #Edit time
 
@@ -127,6 +125,7 @@ TRANSITION:
     N: E
     T: 1.5
     O: g.startSelection()
+       t.stop()
 
 #Shared selection edit
 
@@ -177,6 +176,7 @@ TRANSITION:
     N: N
     T: 2
     O: g.stopSelection()
+       t.start()
 
 TRANSITION:
     S: E.RH
