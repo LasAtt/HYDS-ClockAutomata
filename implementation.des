@@ -13,7 +13,7 @@ INITIALIZER:
     root.mainloop()
 
 STATECHART:
-    MAIN [CS] [DS] 
+    MAIN [CS] [DS]
         MAIN [DS] [HS*]
             N [DS]
             CHRONO
@@ -29,11 +29,7 @@ STATECHART:
             N
     ALARM [CS] [DS]
         OFF [DS]
-            N [DS]
-            EH
-        ON [HS]
-            N [DS]
-            EH
+        ON
     CLOCK [CS] [DS]
         ON [DS]
         OFF
@@ -162,46 +158,24 @@ TRANSITION:
 #Alarm
 
 TRANSITION:
-    S: ALARM.OFF.N
-    N: ALARM.OFF.EH
-    E: setAlarm
-    O: print "toggling alarm"
-
-TRANSITION:
-    S: ALARM.OFF.EH
-    N: ALARM.OFF.N
-    T: 1.5
-    O: print "alarm not toggled"
-
-TRANSITION:
-    S: ALARM.OFF.EH
-    N: ALARM.ON
-    E: onoff
-    O: print "alarm not toggled"
-
-TRANSITION:
-    S: ALARM.ON.N
-    N: ALARM.ON.EH
-    E: setAlarm
-    O: g.setAlarm()
-
-TRANSITION:
-    S: ALARM.ON.EH
-    N: ALARM.ON.N
-    T: 1.5
-    O: print "alarm not toggled"
-
-TRANSITION:
-    S: ALARM.ON.EH
-    N: ALARM.OFF
-    E: onoff
-    O: g.setAlarm()
-
-TRANSITION:
     S: ALARM.ON
     N: ALARM.OFF
-    E: onoff
+    E: alarmToggle
     O: g.setAlarm()
+       print "oof"
+
+TRANSITION:
+    S: ALARM.OFF
+    N: ALARM.ON
+    E: alarmToggle
+    O: g.setAlarm()
+       print "oon"
+
+TRANSITION:
+    S: ALARM.OFF
+    N: ALARM.OFF
+    T: 0.5
+    O: print "kill me"
 
 TRANSITION:
     S: ALARM.ON
@@ -209,6 +183,7 @@ TRANSITION:
     T: 0.5
     O: if g.checkTime():
          g.alarmStart()
+         print "alarming situation"
 
 #Chrono view
 
@@ -260,7 +235,8 @@ TRANSITION:
     S: MAIN.MAIN.AH
     N: MAIN.MAIN.N
     E: onoff
-    O: g.setAlarm()
+    O: eventhandler.event("alarmToggle")
+       print "I love it"
 
 #Edit time
 
