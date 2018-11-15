@@ -7,7 +7,9 @@ INITIALIZER:
     root.title("Product of Texas")
     g = DWatchGUI(root, eventhandler)
 
-    c = AsyncUpdater(g.increaseChronoByOne, g.refreshChronoDisplay, 0.25)
+    def checkAlarm():
+      if g.checkTime():
+        g.alarmStart()
 
     eventhandler.start()
     root.mainloop()
@@ -27,6 +29,9 @@ STATECHART:
         OFF [DS]
         ON
     MAIN [CS] [DS]
+        A
+            Y [DS]
+            N
         MAIN [DS] [HS*]
             N [DS]
             CHRONO
@@ -37,9 +42,7 @@ STATECHART:
                 LH
                 RH
                 I
-        A
-            Y [DS]
-            N
+
 
 TRANSITION:
     S: MAIN.MAIN.N
@@ -49,48 +52,48 @@ TRANSITION:
 
 TRANSITION:
     S: MAIN.MAIN
-    N: MAIN.A
+    N: MAIN.A.Y
     E: alarming
     O: g.setIndiglo()
 
 TRANSITION:
-    S: MAIN.MAIN.A.Y
-    N: MAIN.MAIN.A.N
+    S: MAIN.A.Y
+    N: MAIN.A.N
     T: 0.25
     O: g.unsetIndiglo()
 
 TRANSITION:
-    S: MAIN.MAIN.A.N
-    N: MAIN.MAIN.A.Y
+    S: MAIN.A.N
+    N: MAIN.A.Y
     T: 0.25
     O: g.setIndiglo()
 
 TRANSITION: [HS]
-    S: MAIN.MAIN.A
+    S: MAIN.A
     N: MAIN.MAIN
     T: 4.5
     O: g.unsetIndiglo()
 
-TRANSITION:
-    S: MAIN.MAIN.A
+TRANSITION: [HS]
+    S: MAIN.A
     N: MAIN.MAIN
     E: lightOn
     O: g.unsetIndiglo()
 
-TRANSITION:
-    S: MAIN.MAIN.A
+TRANSITION: [HS]
+    S: MAIN.A
     N: MAIN.MAIN
     E: changeMode
     O: g.unsetIndiglo()
 
-TRANSITION:
-    S: MAIN.MAIN.A
+TRANSITION: [HS]
+    S: MAIN.A
     N: MAIN.MAIN
     E: initChrono
     O: g.unsetIndiglo()
 
-TRANSITION:
-    S: MAIN.MAIN.A
+TRANSITION: [HS]
+    S: MAIN.A
     N: MAIN.MAIN
     E: resetChrono
     O: g.unsetIndiglo()
@@ -272,7 +275,7 @@ TRANSITION:
     S: ATIME.ON
     N: ATIME.ON
     T: 0.5
-    O: if g.checkTime(): g.alarmStart()
+    O: checkAlarm()
 
 #Chrono view
 
