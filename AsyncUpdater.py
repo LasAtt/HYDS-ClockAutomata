@@ -16,7 +16,6 @@ class AsyncUpdater:
       if self.on:
         self.func()
         if self.visible:
-          print self.interval
           self.visibleFunc()
         time.sleep(self.interval)
 

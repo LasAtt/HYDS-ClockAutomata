@@ -13,8 +13,6 @@ INITIALIZER:
             g.alarmStart()
 
     t = AsyncUpdater(clock, g.refreshTimeDisplay, 1)
-    t.start()
-    t.show()
     c = AsyncUpdater(g.increaseChronoByOne, g.refreshChronoDisplay, 0.25)
 
     eventhandler.start()
@@ -22,6 +20,8 @@ INITIALIZER:
 
 STATECHART:
     N [DS]
+      W [DS]
+      R
     A
     L
       O [DS]
@@ -36,6 +36,13 @@ STATECHART:
       LH
       RH
       I
+
+TRANSITION:
+    S: N.W
+    N: N.R
+    T: 0.01
+    O: t.start()
+       t.show()
 
 TRANSITION:
     S: N
@@ -189,7 +196,6 @@ TRANSITION:
     N: N
     T: 2
     O: g.stopSelection()
-       t.start()
 
 TRANSITION:
     S: E.RH
