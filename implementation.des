@@ -16,9 +16,7 @@ STATECHART:
     MAIN [CS] [DS] 
         MAIN [DS] [HS*]
             N [DS]
-            C
-                P [DS]
-                R
+            CHRONO
             AH
             TH
             E
@@ -154,20 +152,20 @@ TRANSITION: [HS]
 TRANSITION:
     S: CHRONO.OFF
     N: CHRONO.ON
-    E: initChrono
+    E: toggleChrono
     O: print "chrono on"
 
 TRANSITION:
     S: CHRONO.ON
     N: CHRONO.OFF
-    E: initChrono
+    E: toggleChrono
     O: print "chrono on"
 
 TRANSITION:
     S: CHRONO.ON
     N: CHRONO.ON
     T: 0.25
-    O: g.increaseChronoByOne
+    O: g.increaseChronoByOne()
 
 #Alarm
 
@@ -220,37 +218,37 @@ TRANSITION:
     O: if g.checkTime():
          g.alarmStart()
 
-#Chrono mode (still need to increase chrono 100 times per second)
+#Chrono view
 
 TRANSITION:
     S: MAIN.MAIN.N
-    N: MAIN.MAIN.C
+    N: MAIN.MAIN.CHRONO
     E: changeMode
     O: g.refreshChronoDisplay()
 
 TRANSITION:
-    S: MAIN.MAIN.C
+    S: MAIN.MAIN.CHRONO
     N: MAIN.MAIN.N
     E: changeMode
     O: g.refreshTimeDisplay()
 
 TRANSITION:
-    S: MAIN.MAIN.C.P
-    N: MAIN.MAIN.C.R
+    S: MAIN.MAIN.CHRONO
+    N: MAIN.MAIN.CHRONO
     E: initChrono
-    O: print "todo"
+    O: eventhandler.event("toggleChrono")
 
 TRANSITION:
-    S: MAIN.MAIN.C.R
-    N: MAIN.MAIN.C.P
-    E: initChrono
-    O: print "todo"
-
-TRANSITION:
-    S: MAIN.MAIN.C
-    N: MAIN.MAIN.C
+    S: MAIN.MAIN.CHRONO
+    N: MAIN.MAIN.CHRONO
     E: resetChrono
-    O: print "todo"
+    O: g.resetChrono()
+
+TRANSITION:
+    S: MAIN.MAIN.CHRONO
+    N: MAIN.MAIN.CHRONO
+    T: 0.12
+    O: g.refreshChronoDisplay()
 
 #Edit alarm
 
