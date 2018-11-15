@@ -13,6 +13,19 @@ INITIALIZER:
     root.mainloop()
 
 STATECHART:
+    CLOCK [CS] [DS]
+        ON [DS]
+        OFF
+    CHRONO [CS] [DS]
+        OFF [DS]
+        ON
+    LIGHTS [CS] [DS]
+        OFF [DS]
+        ON
+        T
+    ATIME [CS] [DS]
+        OFF [DS]
+        ON
     MAIN [CS] [DS]
         MAIN [DS] [HS*]
             N [DS]
@@ -24,22 +37,9 @@ STATECHART:
                 LH
                 RH
                 I
-        ALARM
+        A
             Y [DS]
             N
-    ALARM [CS] [DS]
-        OFF [DS]
-        ON
-    CLOCK [CS] [DS]
-        ON [DS]
-        OFF
-    CHRONO [CS] [DS]
-        OFF [DS]
-        ON
-    LIGHTS [CS] [DS]
-        OFF [DS]
-        ON
-        T
 
 TRANSITION:
     S: MAIN.MAIN.N
@@ -95,128 +95,6 @@ TRANSITION:
     E: resetChrono
     O: g.unsetIndiglo(); g.refreshTimeDisplay()
 
-#Lights
-
-TRANSITION:
-    S: LIGHTS.OFF
-    N: LIGHTS.ON
-    E: lightOn
-    O: g.setIndiglo()
-
-TRANSITION:
-    S: LIGHTS.ON
-    N: LIGHTS.T
-    E: lightOff
-    O: print "light turning off"
-
-TRANSITION:
-    S: LIGHTS.T
-    N: LIGHTS.OFF
-    T: 2
-    O: g.unsetIndiglo()
-
-#Clock
-
-TRANSITION:
-    S: CLOCK.OFF
-    N: CLOCK.ON
-    E: clockOn
-    O: print "clock on"
-
-TRANSITION:
-    S: CLOCK.ON
-    N: CLOCK.OFF
-    E: clockOff
-    O: print "clock off"
-
-TRANSITION: [HS]
-    S: CLOCK.ON
-    N: CLOCK.ON
-    T: 1
-    O: g.increaseTimeByOne()
-
-#Chrono
-
-TRANSITION:
-    S: CHRONO.OFF
-    N: CHRONO.ON
-    E: toggleChrono
-    O: print "chrono on"
-
-TRANSITION:
-    S: CHRONO.ON
-    N: CHRONO.OFF
-    E: toggleChrono
-    O: print "chrono on"
-
-TRANSITION:
-    S: CHRONO.ON
-    N: CHRONO.ON
-    T: 0.25
-    O: g.increaseChronoByOne()
-
-#Alarm
-
-TRANSITION:
-    S: ALARM.ON
-    N: ALARM.OFF
-    E: alarmToggle
-    O: g.setAlarm()
-       print "oof"
-
-TRANSITION:
-    S: ALARM.OFF
-    N: ALARM.ON
-    E: alarmToggle
-    O: g.setAlarm()
-       print "oon"
-
-TRANSITION:
-    S: ALARM.OFF
-    N: ALARM.OFF
-    T: 0.5
-    O: print "kill me"
-
-TRANSITION:
-    S: ALARM.ON
-    N: ALARM.ON
-    T: 0.5
-    O: if g.checkTime():
-         g.alarmStart()
-         print "alarming situation"
-
-#Chrono view
-
-TRANSITION:
-    S: MAIN.MAIN.N
-    N: MAIN.MAIN.CHRONO
-    E: changeMode
-    O: g.refreshChronoDisplay()
-
-TRANSITION:
-    S: MAIN.MAIN.CHRONO
-    N: MAIN.MAIN.N
-    E: changeMode
-    O: g.refreshTimeDisplay()
-
-TRANSITION:
-    S: MAIN.MAIN.CHRONO
-    N: MAIN.MAIN.CHRONO
-    E: initChrono
-    O: eventhandler.event("toggleChrono")
-
-TRANSITION:
-    S: MAIN.MAIN.CHRONO
-    N: MAIN.MAIN.CHRONO
-    E: resetChrono
-    O: g.resetChrono()
-
-TRANSITION:
-    S: MAIN.MAIN.CHRONO
-    N: MAIN.MAIN.CHRONO
-    T: 0.1
-    O: g.refreshChronoDisplay()
-
 #Edit alarm
 
 TRANSITION:
@@ -235,8 +113,7 @@ TRANSITION:
     S: MAIN.MAIN.AH
     N: MAIN.MAIN.N
     E: onoff
-    O: eventhandler.event("alarmToggle")
-       print "I love it"
+    O: eventhandler.event("toggleAlarm")
 
 #Edit time
 
@@ -316,3 +193,115 @@ TRANSITION:
     N: MAIN.MAIN.E.D
     E: released
     O: g.selectNext()
+
+#Lights
+
+TRANSITION:
+    S: LIGHTS.OFF
+    N: LIGHTS.ON
+    E: lightOn
+    O: g.setIndiglo()
+
+TRANSITION:
+    S: LIGHTS.ON
+    N: LIGHTS.T
+    E: lightOff
+    O: print "light turning off"
+
+TRANSITION:
+    S: LIGHTS.T
+    N: LIGHTS.OFF
+    T: 2
+    O: g.unsetIndiglo()
+
+#Clock
+
+TRANSITION:
+    S: CLOCK.OFF
+    N: CLOCK.ON
+    E: clockOn
+    O: print "clock on"
+
+TRANSITION:
+    S: CLOCK.ON
+    N: CLOCK.OFF
+    E: clockOff
+    O: print "clock off"
+
+TRANSITION: [HS]
+    S: CLOCK.ON
+    N: CLOCK.ON
+    T: 1
+    O: g.increaseTimeByOne()
+
+#Chrono
+
+TRANSITION:
+    S: CHRONO.OFF
+    N: CHRONO.ON
+    E: toggleChrono
+    O: print "chrono on"
+
+TRANSITION:
+    S: CHRONO.ON
+    N: CHRONO.OFF
+    E: toggleChrono
+    O: print "chrono on"
+
+TRANSITION:
+    S: CHRONO.ON
+    N: CHRONO.ON
+    T: 0.25
+    O: g.increaseChronoByOne()
+
+#Alarm
+
+TRANSITION:
+    S: ATIME.ON
+    N: ATIME.OFF
+    E: toggleAlarm
+    O: g.setAlarm()
+
+TRANSITION:
+    S: ATIME.OFF
+    N: ATIME.ON
+    E: toggleAlarm
+    O: g.setAlarm()
+
+TRANSITION:
+    S: ATIME.ON
+    N: ATIME.ON
+    T: 0.5
+    O: if g.checkTime(): g.alarmStart()
+
+#Chrono view
+
+TRANSITION:
+    S: MAIN.MAIN.N
+    N: MAIN.MAIN.CHRONO
+    E: changeMode
+    O: g.refreshChronoDisplay()
+
+TRANSITION:
+    S: MAIN.MAIN.CHRONO
+    N: MAIN.MAIN.N
+    E: changeMode
+    O: g.refreshTimeDisplay()
+
+TRANSITION:
+    S: MAIN.MAIN.CHRONO
+    N: MAIN.MAIN.CHRONO
+    E: initChrono
+    O: eventhandler.event("toggleChrono")
+
+TRANSITION:
+    S: MAIN.MAIN.CHRONO
+    N: MAIN.MAIN.CHRONO
+    E: resetChrono
+    O: g.resetChrono()
+
+TRANSITION:
+    S: MAIN.MAIN.CHRONO
+    N: MAIN.MAIN.CHRONO
+    T: 0.1
+    O: g.refreshChronoDisplay()
