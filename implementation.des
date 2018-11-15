@@ -3,7 +3,7 @@ INITIALIZER:
     from DWatchGUI import DWatchGUI
 
     root = Tk()
-    root.title("Kys me now")
+    root.title("Texas Quality")
     g = DWatchGUI(root, eventhandler)
 
     eventhandler.start()
@@ -18,6 +18,7 @@ STATECHART:
     C
       D [DS]
       A
+    AM
     AH
     TH
     E
@@ -31,6 +32,24 @@ TRANSITION:
     N: N
     T: 1
     O: g.increaseTimeByOne()
+
+TRANSITION:
+    S: N
+    N: AM
+    T: alarming
+    O: g.setIndiglo()
+
+TRANSITION:
+    S: AM
+    N: N
+    T: 4
+    O: g.refreshTimeDisplay()
+
+TRANSITION:
+    S: AM
+    N: N
+    T: changeMode; lightOn; initChrono; resetChrono
+    O: g.refreshTimeDisplay()
 
 TRANSITION:
     S: N
@@ -112,7 +131,7 @@ TRANSITION:
     S: AH
     N: N
     E: onoff
-    O: g.refreshTimeDisplay()
+    O: g.setAlarm(); g.refreshTimeDisplay()
 
 
 #Edit time
@@ -131,7 +150,7 @@ TRANSITION:
 
 TRANSITION:
     S: TH
-    N: E
+    N: E.D
     T: 1.5
     O: g.startSelection()
 
