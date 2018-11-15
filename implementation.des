@@ -6,7 +6,13 @@ INITIALIZER:
     root = Tk()
     root.title("Serious title")
     g = DWatchGUI(root, eventhandler)
-    t = AsyncUpdater(g.increaseTimeByOne, g.refreshTimeDisplay, 1)
+
+    def clock():
+        g.increaseTimeByOne()
+        if g.checkTime():
+            g.alarmStart()
+
+    t = AsyncUpdater(clock, g.refreshTimeDisplay, 1)
     t.start()
     t.show()
     c = AsyncUpdater(g.increaseChronoByOne, g.refreshChronoDisplay, 0.25)
@@ -16,6 +22,7 @@ INITIALIZER:
 
 STATECHART:
     N [DS]
+    A
     L
       O [DS]
       T
@@ -35,6 +42,12 @@ TRANSITION:
     N: L
     E: lightOn
     O: g.setIndiglo()
+
+TRANSITION:
+    S: N
+    N: A
+    E: alarming
+    O: print "todo"
 
 TRANSITION:
     S: L.O
