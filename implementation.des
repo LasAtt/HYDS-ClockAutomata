@@ -35,9 +35,7 @@ STATECHART:
             N [DS]
             EH
     CLOCK [CS] [DS]
-        ON [DS] [HS]
-            N [DS]
-            EH
+        ON [DS]
         OFF
     CHRONO [CS] [DS]
         OFF [DS]
@@ -50,7 +48,7 @@ STATECHART:
 TRANSITION:
     S: MAIN.MAIN.N
     N: MAIN.MAIN.N
-    T: 0.25
+    T: 0.5
     O: g.refreshTimeDisplay()
 
 TRANSITION:
@@ -126,19 +124,13 @@ TRANSITION:
 TRANSITION:
     S: CLOCK.OFF
     N: CLOCK.ON
-    E: initChrono
-    O: print "chrono on"
+    E: clockOn
+    O: print "clock on"
 
 TRANSITION:
-    S: CLOCK.ON.N
-    N: CLOCK.ON.EH
-    E: editTime
-    O: print "chrono on"
-
-TRANSITION:
-    S: CLOCK.ON.EH
+    S: CLOCK.ON
     N: CLOCK.OFF
-    T: 1.5
+    E: clockOff
     O: print "clock off"
 
 TRANSITION: [HS]
@@ -247,7 +239,7 @@ TRANSITION:
 TRANSITION:
     S: MAIN.MAIN.CHRONO
     N: MAIN.MAIN.CHRONO
-    T: 0.12
+    T: 0.1
     O: g.refreshChronoDisplay()
 
 #Edit alarm
@@ -288,7 +280,7 @@ TRANSITION:
     S: MAIN.MAIN.TH
     N: MAIN.MAIN.E
     T: 1.5
-    O: t.stop()
+    O: eventhandler.event("clockOff")
        g.startSelection()
 
 #Shared selection edit
@@ -298,6 +290,7 @@ TRANSITION:
     N: MAIN.MAIN.N
     T: 5
     O: g.stopSelection()
+       eventhandler.event("clockOn")
 
 TRANSITION:
     S: MAIN.MAIN.E.D
@@ -340,6 +333,7 @@ TRANSITION:
     N: MAIN.MAIN.N
     T: 2
     O: g.stopSelection()
+       eventhandler.event("clockOn")
 
 TRANSITION:
     S: MAIN.MAIN.E.RH
