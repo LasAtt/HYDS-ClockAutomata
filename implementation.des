@@ -4,7 +4,7 @@ INITIALIZER:
     from AsyncUpdater import AsyncUpdater
 
     root = Tk()
-    root.title("Serious title")
+    root.title("Product of Texas")
     g = DWatchGUI(root, eventhandler)
 
     def clock():
@@ -23,6 +23,8 @@ STATECHART:
       W [DS]
       R
     A
+      Y [DS]
+      N
     L
       O [DS]
       T
@@ -50,11 +52,55 @@ TRANSITION:
     E: lightOn
     O: g.setIndiglo()
 
+#Alarming stuff
+
 TRANSITION:
     S: N
-    N: A
+    N: A.Y
     E: alarming
-    O: print "todo"
+    O: g.setIndiglo()
+
+TRANSITION:
+    S: A.Y
+    N: A.N
+    T: 0.25
+    O: g.unsetIndiglo()
+
+TRANSITION:
+    S: A.N
+    N: A.Y
+    T: 0.25
+    O: g.setIndiglo()
+
+TRANSITION:
+    S: A
+    N: N
+    T: 4.5
+    O: g.unsetIndiglo(); g.refreshTimeDisplay()
+
+TRANSITION:
+    S: A
+    N: N
+    E: lightOn
+    O: g.unsetIndiglo(); g.refreshTimeDisplay()
+
+TRANSITION:
+    S: A
+    N: N
+    E: changeMode
+    O: g.unsetIndiglo(); g.refreshTimeDisplay()
+
+TRANSITION:
+    S: A
+    N: N
+    E: initChrono
+    O: g.unsetIndiglo(); g.refreshTimeDisplay()
+
+TRANSITION:
+    S: A
+    N: N
+    E: resetChrono
+    O: g.unsetIndiglo(); g.refreshTimeDisplay()
 
 TRANSITION:
     S: L.O
@@ -124,7 +170,7 @@ TRANSITION:
     S: AH
     N: N
     E: onoff
-    O: t.show()
+    O: g.setAlarm(); t.show()
 
 #Edit time
 
@@ -144,8 +190,7 @@ TRANSITION:
     S: TH
     N: E
     T: 1.5
-    O: g.startSelection()
-       t.stop()
+    O: g.startSelection(); t.stop()
 
 #Shared selection edit
 
@@ -183,13 +228,13 @@ TRANSITION:
     S: E.I
     N: E.D
     E: stopInc
-    O: print "enough"
+    O: print "increase stopped"
 
 TRANSITION:
     S: E.D
     N: E.RH
     E: finishEdit
-    O: print "aaAA"
+    O: print "edit finished"
 
 TRANSITION:
     S: E.RH
