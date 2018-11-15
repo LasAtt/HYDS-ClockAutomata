@@ -1,13 +1,14 @@
 INITIALIZER:
     from Tkinter import *
     from DWatchGUI import DWatchGUI
+    from ChronoUpdater import ChronoUpdater
 
     root = Tk()
     root.title("Kys me now")
     g = DWatchGUI(root, eventhandler)
+    u = ChronoUpdater(g)
 
     eventhandler.start()
-
     root.mainloop()
 
 STATECHART:
@@ -16,8 +17,8 @@ STATECHART:
       O [DS]
       T
     C
-      D [DS]
-      A
+      P [DS]
+      R
     AH
     TH
     E
@@ -54,45 +55,37 @@ TRANSITION:
 
 TRANSITION:
     S: N
-    N: C.D
+    N: C
     E: changeMode
-    O: g.refreshChronoDisplay()
+    O: u.show()
+       g.refreshChronoDisplay()
 
 TRANSITION:
-    S: C.D
+    S: C
     N: N
     E: changeMode
-    O: g.refreshTimeDisplay()
+    O:  u.hide()
+        g.refreshTimeDisplay()
 
 TRANSITION:
-    S: C.A
-    N: N
-    E: changeMode
-    O: g.refreshTimeDisplay()
+    S: C.P
+    N: C.R
+    E: released
+    O: u.start()
 
 TRANSITION:
-    S: C.D
-    N: C.A
-    E: initChrono
-    O: g.increaseChronoByOne()
-
-TRANSITION:
-    S: C.A
-    N: C.A
-    E: 0.25
-    O: g.refreshChronoDisplay()
-
-TRANSITION:
-    S: C.A
-    N: C.D
-    E: initChrono
-    O: g.refreshChronoDisplay()
+    S: C.R
+    N: C.P
+    E: released
+    O: u.stop()
 
 TRANSITION:
     S: C
     N: C
     E: resetChrono
-    O: g.resetChrono()
+    O: u.stop()
+       g.resetChrono()
+       u.start()
 
 #Edit alarm
 
