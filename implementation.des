@@ -48,8 +48,8 @@ TRANSITION:
     O: g.refreshTimeDisplay()
 
 TRANSITION:
-    S: MAIN.MAIN.N
-    N: MAIN.MAIN.A.Y
+    S: MAIN.MAIN
+    N: MAIN.A
     E: alarming
     O: g.setIndiglo()
 
@@ -65,35 +65,35 @@ TRANSITION:
     T: 0.25
     O: g.setIndiglo()
 
-TRANSITION:
+TRANSITION: [HS]
     S: MAIN.MAIN.A
-    N: MAIN.MAIN.N
+    N: MAIN.MAIN
     T: 4.5
-    O: g.unsetIndiglo(); g.refreshTimeDisplay()
+    O: g.unsetIndiglo()
 
 TRANSITION:
     S: MAIN.MAIN.A
-    N: MAIN.MAIN.N
+    N: MAIN.MAIN
     E: lightOn
-    O: g.unsetIndiglo(); g.refreshTimeDisplay()
+    O: g.unsetIndiglo()
 
 TRANSITION:
     S: MAIN.MAIN.A
-    N: MAIN.MAIN.N
+    N: MAIN.MAIN
     E: changeMode
-    O: g.unsetIndiglo(); g.refreshTimeDisplay()
+    O: g.unsetIndiglo()
 
 TRANSITION:
     S: MAIN.MAIN.A
-    N: MAIN.MAIN.N
+    N: MAIN.MAIN
     E: initChrono
-    O: g.unsetIndiglo(); g.refreshTimeDisplay()
+    O: g.unsetIndiglo()
 
 TRANSITION:
     S: MAIN.MAIN.A
-    N: MAIN.MAIN.N
+    N: MAIN.MAIN
     E: resetChrono
-    O: g.unsetIndiglo(); g.refreshTimeDisplay()
+    O: g.unsetIndiglo()
 
 #Edit alarm
 
