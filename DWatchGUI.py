@@ -64,6 +64,7 @@ class DWatchGUI:
   #Modify the state:
 
   def refreshTimeDisplay(self):
+    print "time"
     self.GUI.drawTime()
 
   def refreshChronoDisplay(self):

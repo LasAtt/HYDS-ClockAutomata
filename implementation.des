@@ -7,245 +7,344 @@ INITIALIZER:
     root.title("Product of Texas")
     g = DWatchGUI(root, eventhandler)
 
-    alarm = False
-
-    def clock():
-        g.increaseTimeByOne()
-        if alarm and g.checkTime():
-            g.alarmStart()
-
-    t = AsyncUpdater(clock, g.refreshTimeDisplay, 1)
     c = AsyncUpdater(g.increaseChronoByOne, g.refreshChronoDisplay, 0.25)
 
     eventhandler.start()
     root.mainloop()
 
 STATECHART:
-    N [DS]
-      W [DS]
-      R
-    A
-      Y [DS]
-      N
-    L
-      O [DS]
-      T
-    C
-      P [DS]
-      R
-    AH
-    TH
-    E
-      D [DS]
-      LH
-      RH
-      I
+    MAIN [CS] [DS] 
+        MAIN [DS] [HS*]
+            N [DS]
+            C
+                P [DS]
+                R
+            AH
+            TH
+            E
+                D [DS]
+                LH
+                RH
+                I
+        ALARM
+            Y [DS]
+            N
+    ALARM [CS] [DS]
+        OFF [DS]
+            N [DS]
+            EH
+        ON [HS]
+            N [DS]
+            EH
+    CLOCK [CS] [DS]
+        ON [DS] [HS]
+            N [DS]
+            EH
+        OFF
+    CHRONO [CS] [DS]
+        OFF [DS]
+        ON
+    LIGHTS [CS] [DS]
+        OFF [DS]
+        ON
+        T
 
 TRANSITION:
-    S: N.W
-    N: N.R
-    T: 0
-    O: t.start()
-       t.show()
+    S: MAIN.MAIN.N
+    N: MAIN.MAIN.N
+    T: 0.25
+    O: g.refreshTimeDisplay()
 
 TRANSITION:
-    S: N
-    N: L
-    E: lightOn
+    S: MAIN.MAIN.N
+    N: MAIN.MAIN.A.Y
+    E: alarming
     O: g.setIndiglo()
 
-#Alarming stuff
-
 TRANSITION:
-    S: N
-    N: A.Y
-    E: alarming
-    O: g.setIndiglo(); alarm = False
-
-TRANSITION:
-    S: A.Y
-    N: A.N
+    S: MAIN.MAIN.A.Y
+    N: MAIN.MAIN.A.N
     T: 0.25
     O: g.unsetIndiglo()
 
 TRANSITION:
-    S: A.N
-    N: A.Y
+    S: MAIN.MAIN.A.N
+    N: MAIN.MAIN.A.Y
     T: 0.25
     O: g.setIndiglo()
 
 TRANSITION:
-    S: A
-    N: N
+    S: MAIN.MAIN.A
+    N: MAIN.MAIN.N
     T: 4.5
     O: g.unsetIndiglo(); g.refreshTimeDisplay()
 
 TRANSITION:
-    S: A
-    N: N
+    S: MAIN.MAIN.A
+    N: MAIN.MAIN.N
     E: lightOn
     O: g.unsetIndiglo(); g.refreshTimeDisplay()
 
 TRANSITION:
-    S: A
-    N: N
+    S: MAIN.MAIN.A
+    N: MAIN.MAIN.N
     E: changeMode
     O: g.unsetIndiglo(); g.refreshTimeDisplay()
 
 TRANSITION:
-    S: A
-    N: N
+    S: MAIN.MAIN.A
+    N: MAIN.MAIN.N
     E: initChrono
     O: g.unsetIndiglo(); g.refreshTimeDisplay()
 
 TRANSITION:
-    S: A
-    N: N
+    S: MAIN.MAIN.A
+    N: MAIN.MAIN.N
     E: resetChrono
     O: g.unsetIndiglo(); g.refreshTimeDisplay()
 
+#Lights
+
 TRANSITION:
-    S: L.O
-    N: L.T
+    S: LIGHTS.OFF
+    N: LIGHTS.ON
+    E: lightOn
+    O: g.setIndiglo()
+
+TRANSITION:
+    S: LIGHTS.ON
+    N: LIGHTS.T
     E: lightOff
     O: print "light turning off"
 
 TRANSITION:
-    S: L.T
-    N: N
+    S: LIGHTS.T
+    N: LIGHTS.OFF
     T: 2
     O: g.unsetIndiglo()
+
+#Clock
+
+TRANSITION:
+    S: CLOCK.OFF
+    N: CLOCK.ON
+    E: initChrono
+    O: print "chrono on"
+
+TRANSITION:
+    S: CLOCK.ON.N
+    N: CLOCK.ON.EH
+    E: editTime
+    O: print "chrono on"
+
+TRANSITION:
+    S: CLOCK.ON.EH
+    N: CLOCK.OFF
+    T: 1.5
+    O: print "clock off"
+
+TRANSITION: [HS]
+    S: CLOCK.ON
+    N: CLOCK.ON
+    T: 1
+    O: g.increaseTimeByOne()
+
+#Chrono
+
+TRANSITION:
+    S: CHRONO.OFF
+    N: CHRONO.ON
+    E: initChrono
+    O: print "chrono on"
+
+TRANSITION:
+    S: CHRONO.ON
+    N: CHRONO.OFF
+    E: initChrono
+    O: print "chrono on"
+
+TRANSITION:
+    S: CHRONO.ON
+    N: CHRONO.ON
+    T: 0.25
+    O: g.increaseChronoByOne
+
+#Alarm
+
+TRANSITION:
+    S: ALARM.OFF.N
+    N: ALARM.OFF.EH
+    E: setAlarm
+    O: print "toggling alarm"
+
+TRANSITION:
+    S: ALARM.OFF.EH
+    N: ALARM.OFF.N
+    T: 1.5
+    O: print "alarm not toggled"
+
+TRANSITION:
+    S: ALARM.OFF.EH
+    N: ALARM.ON
+    E: onoff
+    O: print "alarm not toggled"
+
+TRANSITION:
+    S: ALARM.ON.N
+    N: ALARM.ON.EH
+    E: setAlarm
+    O: g.setAlarm()
+
+TRANSITION:
+    S: ALARM.ON.EH
+    N: ALARM.ON.N
+    T: 1.5
+    O: print "alarm not toggled"
+
+TRANSITION:
+    S: ALARM.ON.EH
+    N: ALARM.OFF
+    E: onoff
+    O: g.setAlarm()
+
+TRANSITION:
+    S: ALARM.ON
+    N: ALARM.OFF
+    E: onoff
+    O: g.setAlarm()
+
+TRANSITION:
+    S: ALARM.ON
+    N: ALARM.ON
+    T: 0.5
+    O: if g.checkTime():
+         g.alarmStart()
 
 #Chrono mode (still need to increase chrono 100 times per second)
 
 TRANSITION:
-    S: N
-    N: C
+    S: MAIN.MAIN.N
+    N: MAIN.MAIN.C
     E: changeMode
-    O: t.hide()
-       c.show()
-       g.refreshChronoDisplay()
+    O: g.refreshChronoDisplay()
 
 TRANSITION:
-    S: C
-    N: N
+    S: MAIN.MAIN.C
+    N: MAIN.MAIN.N
     E: changeMode
-    O: c.hide()
-       t.show()
-       g.refreshTimeDisplay()
+    O: g.refreshTimeDisplay()
 
 TRANSITION:
-    S: C.P
-    N: C.R
+    S: MAIN.MAIN.C.P
+    N: MAIN.MAIN.C.R
     E: initChrono
-    O: c.start()
+    O: print "todo"
 
 TRANSITION:
-    S: C.R
-    N: C.P
+    S: MAIN.MAIN.C.R
+    N: MAIN.MAIN.C.P
     E: initChrono
-    O: c.stop()
+    O: print "todo"
 
 TRANSITION:
-    S: C
-    N: C
+    S: MAIN.MAIN.C
+    N: MAIN.MAIN.C
     E: resetChrono
-    O: g.resetChrono()
-       c.start()
+    O: print "todo"
 
 #Edit alarm
 
 TRANSITION:
-    S: N
-    N: AH
+    S: MAIN.MAIN.N
+    N: MAIN.MAIN.AH
     E: setAlarm
-    O: t.hide()
-       g.refreshAlarmDisplay()
+    O: g.refreshAlarmDisplay()
 
 TRANSITION:
-    S: AH
-    N: E.D
+    S: MAIN.MAIN.AH
+    N: MAIN.MAIN.E.D
     T: 1.5
     O: g.startSelection()
 
 TRANSITION:
-    S: AH
-    N: N
+    S: MAIN.MAIN.AH
+    N: MAIN.MAIN.N
     E: onoff
-    O: g.setAlarm(); alarm = not alarm; t.show()
+    O: g.setAlarm()
 
 #Edit time
 
 TRANSITION:
-    S: N
-    N: TH
+    S: MAIN.MAIN.N
+    N: MAIN.MAIN.TH
     E: editTime
     O: print "button pressed"
 
 TRANSITION:
-    S: TH
-    N: N
+    S: MAIN.MAIN.TH
+    N: MAIN.MAIN.N
     E: released
     O: print "button released"
 
 TRANSITION:
-    S: TH
-    N: E
+    S: MAIN.MAIN.TH
+    N: MAIN.MAIN.E
     T: 1.5
-    O: g.startSelection(); t.stop()
+    O: t.stop()
+       g.startSelection()
 
 #Shared selection edit
 
 TRANSITION:
-    S: E.D
-    N: N
+    S: MAIN.MAIN.E.D
+    N: MAIN.MAIN.N
     T: 5
     O: g.stopSelection()
 
 TRANSITION:
-    S: E.D
-    N: E.LH
+    S: MAIN.MAIN.E.D
+    N: MAIN.MAIN.E.LH
     E: increase
     O: print "increase pressed"
 
 TRANSITION:
-    S: E.LH
-    N: E.D
+    S: MAIN.MAIN.E.LH
+    N: MAIN.MAIN.E.D
     E: stopInc
     O: g.increaseSelection()
 
 TRANSITION:
-    S: E.LH
-    N: E.I
+    S: MAIN.MAIN.E.LH
+    N: MAIN.MAIN.E.I
     T: 0.3
     O: g.increaseSelection()
 
 TRANSITION:
-    S: E.I
-    N: E.I
+    S: MAIN.MAIN.E.I
+    N: MAIN.MAIN.E.I
     T: 0.3
     O: g.increaseSelection()
 
 TRANSITION:
-    S: E.I
-    N: E.D
+    S: MAIN.MAIN.E.I
+    N: MAIN.MAIN.E.D
     E: stopInc
     O: print "increase stopped"
 
 TRANSITION:
-    S: E.D
-    N: E.RH
+    S: MAIN.MAIN.E.D
+    N: MAIN.MAIN.E.RH
     E: finishEdit
     O: print "edit finished"
 
 TRANSITION:
-    S: E.RH
-    N: N
+    S: MAIN.MAIN.E.RH
+    N: MAIN.MAIN.N
     T: 2
     O: g.stopSelection()
 
 TRANSITION:
-    S: E.RH
-    N: E.D
+    S: MAIN.MAIN.E.RH
+    N: MAIN.MAIN.E.D
     E: released
     O: g.selectNext()
