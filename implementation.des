@@ -42,7 +42,7 @@ STATECHART:
 TRANSITION:
     S: N.W
     N: N.R
-    T: 0.01
+    T: 0
     O: t.start()
        t.show()
 
